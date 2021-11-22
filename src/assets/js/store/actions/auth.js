@@ -1,5 +1,5 @@
 // import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+// import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 
 export const AUTHENTICATE = "AUTHENTICATE";
 export const LOGOUT = "LOGOUT";
@@ -20,46 +20,46 @@ export const authenticate = (userId, token, expiryTime) => {
 
 export const signup = (email, password) => {
   return async (dispatch) => {
-    const auth = getAuth();
-    let user;
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        user = userCredential;
+    // const auth = getAuth();
+    // let user;
+    // createUserWithEmailAndPassword(auth, email, password)
+    //   .then((userCredential) => {
+    //     // Signed in
+    //     user = userCredential;
 
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
-      });
-    // const response = await fetch(
-    //   "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBwo56YgfFAA4oyb3sRTxtktPkHmKGHkCQ",
-    //   {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       email: email,
-    //       password: password,
-    //       returnSecureToken: true,
-    //     }),
-    //   }
-    // );
+    //     // ...
+    //   })
+    //   .catch((error) => {
+    //     const errorCode = error.code;
+    //     const errorMessage = error.message;
+    //     // ..
+    //   });
+    const response = await fetch(
+      "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBwo56YgfFAA4oyb3sRTxtktPkHmKGHkCQ",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          returnSecureToken: true,
+        }),
+      }
+    );
 
-    // if (!response.ok) {
-    //   const errorResData = await response.json();
-    //   const errorId = errorResData.error.message;
-    //   let message = "Something went wrong!";
-    //   if (errorId === "EMAIL_EXISTS") {
-    //     message = "This email exists already!";
-    //   }
-    //   throw new Error(message);
-    // }
+    if (!response.ok) {
+      const errorResData = await response.json();
+      const errorId = errorResData.error.message;
+      let message = "Something went wrong!";
+      if (errorId === "EMAIL_EXISTS") {
+        message = "This email exists already!";
+      }
+      throw new Error(message);
+    }
 
-    // const resData = await response.json();
+    const resData = await response.json();
 
     dispatch(
       authenticate(
@@ -78,6 +78,17 @@ export const signup = (email, password) => {
 
 export const login = (email, password) => {
   return async (dispatch) => {
+    // const auth = getAuth();
+    // signInWithEmailAndPassword(auth, email, password)
+    //   .then((userCredential) => {
+    //     // Signed in
+    //     const user = userCredential.user;
+    //     // ...
+    //   })
+    //   .catch((error) => {
+    //     const errorCode = error.code;
+    //     const errorMessage = error.message;
+    //   });
     const response = await fetch(
       "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBwo56YgfFAA4oyb3sRTxtktPkHmKGHkCQ",
       {
@@ -123,7 +134,7 @@ export const login = (email, password) => {
 
 export const logout = () => {
   clearLogoutTimer();
-  AsyncStorage.removeItem("userData");
+  localStorage.removeItem("userData");
   return { type: LOGOUT };
 };
 
@@ -142,7 +153,7 @@ const setLogoutTimer = (expirationTime) => {
 };
 
 const saveDataToStorage = (token, userId, expirationDate) => {
-  AsyncStorage.setItem(
+  localStorage.setItem(
     "userData",
     JSON.stringify({
       token: token,

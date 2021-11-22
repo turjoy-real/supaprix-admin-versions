@@ -1,3 +1,6 @@
+import * as authActions from "./store/actions/auth";
+import store from "./dist/store/main";
+
 class Login {
   constructor(form, fields) {
     this.form = form;
@@ -16,18 +19,80 @@ class Login {
       // loop through the fields and check them against a function for validation
       self.fields.forEach((field) => {
         const input = document.querySelector(`#${field}`);
+
         if (self.validateFields(input) == false) {
           // if a field does not validate, auto-increment our error integer
           error++;
         }
       });
+      // const stuff = document.getElementById("username").value;
+
       // if everything validates, error will be 0 and can continue
       if (error == 0) {
+        this.signIn(0);
         //do login api here or in this case, just submit the form and set a localStorage item
         localStorage.setItem("auth", 1);
         this.form.submit();
       }
     });
+  }
+
+  // xxxxxxxxxx Working For Sign In Form xxxxxxxxxx
+  // xxxxxxxxxx Sign In Email Validation xxxxxxxxxx
+  checkUserSIEmail() {
+    var userSIEmail = document.getElementById("username");
+    var userSIEmailFormate =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var flag;
+    if (userSIEmail.value.match(userSIEmailFormate)) {
+      flag = false;
+    } else {
+      flag = true;
+    }
+    if (flag) {
+      document.getElementById("username").style.display = "block";
+    } else {
+      document.getElementById("username").style.display = "none";
+    }
+  }
+  // xxxxxxxxxx Sign In Password Validation xxxxxxxxxx
+  checkUserSIPassword() {
+    var userSIPassword = document.getElementById("userSIPassword");
+    var userSIPasswordFormate = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{10,}/;
+    var flag;
+    if (userSIPassword.value.match(userSIPasswordFormate)) {
+      flag = false;
+    } else {
+      flag = true;
+    }
+    if (flag) {
+      document.getElementById("userSIPasswordError").style.display = "block";
+    } else {
+      document.getElementById("userSIPasswordError").style.display = "none";
+    }
+  }
+  // xxxxxxxxxx Check email or password exsist in firebase authentication xxxxxxxxxx
+  signIn() {
+    var userSIEmail = document.getElementById("username").value;
+    var userSIPassword = document.getElementById("password").value;
+    var userSIEmailFormate =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    var userSIPasswordFormate = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{10,}/;
+
+    var checkUserEmailValid = userSIEmail.match(userSIEmailFormate);
+    var checkUserPasswordValid = userSIPassword.match(userSIPasswordFormate);
+
+    if (checkUserEmailValid == null) {
+      return checkUserSIEmail();
+    } else if (checkUserPasswordValid == null) {
+      return checkUserSIPassword();
+    } else {
+      try {
+        store.dispatch(authActions.login(userSIEmail, userSIPassword));
+      } catch (error) {
+        console.log(error);
+      }
+    }
   }
 
   validateFields(field) {

@@ -1,3 +1,6 @@
+import * as authActions from "./store/actions/auth.js";
+import store from "./dist/store/main.js";
+
 class Auth {
   // setup the class and hide the body by default
   constructor() {
@@ -16,6 +19,7 @@ class Auth {
   // will remove the localStorage item and redirect to login  screen
   logOut() {
     localStorage.removeItem("auth");
+    store.dispatch(authActions.logout());
     window.location.replace("/");
   }
 }
